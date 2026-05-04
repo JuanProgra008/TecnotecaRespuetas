@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tecnoteca - Encuesta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../Index.css">
+  <script src="page-theme.js" defer></script>
+</head>
+<body class="survey-page">
+  <div class="floating-logos" aria-hidden="true">
+    <img class="floating-logo logo-shape logo-f1" src="../Images/Tec.png" alt="">
+    <img class="floating-logo logo-textmark logo-f2" src="../Images/EDuc (1).png" alt="">
+    <img class="floating-logo logo-shape logo-f3" src="../Images/Tec.png" alt="">
+    <img class="floating-logo logo-textmark logo-f4" src="../Images/EDuc (1).png" alt="">
+    <img class="floating-logo logo-shape logo-f5" src="../Images/Tec.png" alt="">
+    <img class="floating-logo logo-textmark logo-f6" src="../Images/EDuc (1).png" alt="">
+  </div>
+
+  <div class="floating-squares" aria-hidden="true">
+    <div class="square-logo sq-1"><img src="../Images/Tec.png" alt=""></div>
+    <div class="square-logo sq-2"><img src="../Images/EDuc (1).png" alt=""></div>
+  </div>
+
+  <main class="app-shell subpage-shell demo-shell">
+    <section class="panel demo-panel survey-demo">
+      <div class="demo-top">
+        <a class="btn btn-soft back-home-btn" href="../Index.html">Volver al inicio</a>
+        <span class="demo-user">Jugador: <strong id="playerLabel">Sin nombre</strong></span>
+      </div>
+
+      <h1 class="hero-title demo-title">Ayudanos a mejorar</h1>
+
+      <form id="demoSurveyForm" class="demo-form">
+        <label>
+          ¿Como fue tu visita?
+          <select required>
+            <option value="" selected disabled>Selecciona una opcion</option>
+            <option>Excelente</option>
+            <option>Buena</option>
+            <option>Regular</option>
+            <option>Mejorable</option>
+          </select>
+        </label>
+
+        <label>
+          ¿Que te gusto mas?
+          <select required>
+            <option value="" selected disabled>Selecciona una opcion</option>
+            <option>Zona de tecnologia</option>
+            <option>Zona de lectura</option>
+            <option>Talleres</option>
+            <option>Juegos</option>
+          </select>
+        </label>
+
+        <label>
+          Comentarios
+          <textarea rows="4" placeholder="Escribe una sugerencia..."></textarea>
+        </label>
+
+        <div class="demo-actions">
+          <button class="btn btn-primary" type="submit">ENVIAR</button>
+        </div>
+      </form>
+
+      <p id="surveyFeedback" class="demo-feedback">Completa el formulario para ver el mensaje de envio.</p>
+    </section>
+  </main>
+
+  <script>
+   const player = localStorage.getItem("tecnotecaPlayerName") || "Sin nombre";
+   document.getElementById("playerLabel").textContent = player;
+
+        const form = document.getElementById("demoSurveyForm");
+        const feedback = document.getElementById("surveyFeedback");
+
+        // REEMPLAZA ESTO CON TU URL
+        const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6tNhVq3hcBL8_3TJ11LYUzD_4HxBsyA1Fb7k69VHfRaJwzDj0yy88_u4dJccxBKzzVQ/exec";
+
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          
+        const selects = form.querySelectorAll("select");
+        const textarea = form.querySelector("textarea");
+          
+        const datos = {
+            visita: selects[0].value,
+            gusto: selects[1].value,
+            comentarios: textarea.value
+          };
+          
+        try {
+            feedback.textContent = "Enviando respuestas...";
+            console.log("Enviando datos:", datos);
+            
+            const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+              method: "POST",
+              body: JSON.stringify(datos)
+            });
+            
+            const result = await response.json();
+            console.log("Respuesta del servidor:", result);
+            
+            if (result.success) {
+                feedback.textContent = "¡Gracias por tu respuesta! Volviendo al inicio...";
+                form.reset();
+                
+                setTimeout(() => {
+                  window.location.href = "../Index.html";
+                }, 1800);
+            } else {
+                feedback.textContent = "Error: " + (result.error || "Desconocido");
+            }
+            
+            } catch (error) {
+              feedback.textContent = "Error al enviar: " + error.message;
+              console.error("Error completo:", error);
+            }
+        });
+  </script>
+</body>
+</html>
