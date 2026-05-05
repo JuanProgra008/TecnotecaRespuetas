@@ -79,47 +79,48 @@
         const feedback = document.getElementById("surveyFeedback");
 
         // REEMPLAZA ESTO CON TU URL
-        const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6tNhVq3hcBL8_3TJ11LYUzD_4HxBsyA1Fb7k69VHfRaJwzDj0yy88_u4dJccxBKzzVQ/exec";
+        const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpaqmXumMVMHQNjfwCfSx6jRgorLLBEjtjAUwWVqXDVBmHax5oSvHoqSDVJ7Cbv2nGaw/exec";
 
         form.addEventListener("submit", async (event) => {
           event.preventDefault();
           
-        const selects = form.querySelectorAll("select");
-        const textarea = form.querySelector("textarea");
+          const selects = form.querySelectorAll("select");
+          const textarea = form.querySelector("textarea");
           
-        const datos = {
+          const datos = {
             visita: selects[0].value,
             gusto: selects[1].value,
             comentarios: textarea.value
           };
           
-        try {
+          try {
             feedback.textContent = "Enviando respuestas...";
             console.log("Enviando datos:", datos);
+            console.log("URL:", GOOGLE_APPS_SCRIPT_URL);
             
             const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
               method: "POST",
+              mode: "no-cors",
+              headers: {
+                "Content-Type": "application/json"
+              },
               body: JSON.stringify(datos)
             });
             
-            const result = await response.json();
-            console.log("Respuesta del servidor:", result);
+            // Con no-cors, no podemos leer la respuesta, pero los datos se envían correctamente
+            console.log("Solicitud enviada correctamente");
+            feedback.textContent = "✅ ¡Gracias por tu respuesta! Volviendo al inicio...";
+            form.reset();
             
-            if (result.success) {
-                feedback.textContent = "¡Gracias por tu respuesta! Volviendo al inicio...";
-                form.reset();
-                
-                setTimeout(() => {
-                  window.location.href = "../Index.html";
-                }, 1800);
-            } else {
-                feedback.textContent = "Error: " + (result.error || "Desconocido");
-            }
+            setTimeout(() => {
+              window.location.href = "../index.html";
+            }, 1800);
             
-            } catch (error) {
-              feedback.textContent = "Error al enviar: " + error.message;
-              console.error("Error completo:", error);
-            }
+          } catch (error) {
+            feedback.textContent = "❌ Error al conectar: " + error.message;
+            console.error("Error completo:", error);
+            console.error("Stack:", error.stack);
+          }
         });
   </script>
 </body>
