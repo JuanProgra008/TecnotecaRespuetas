@@ -68,34 +68,39 @@
       </form>
 
       <p id="surveyFeedback" class="demo-feedback">Completa el formulario para ver el mensaje de envio.</p>
-      
-      <!-- iframe oculto para enviar datos a Google Apps Script -->
-      <iframe id="responseFrame" name="responseFrame" style="display:none"></iframe>
     </section>
   </main>
 
   <script>
-   const player = localStorage.getItem("tecnotecaPlayerName") || "Sin nombre";
-   document.getElementById("playerLabel").textContent = player;
+      const player = localStorage.getItem("tecnotecaPlayerName") || "Sin nombre";
+      document.getElementById("playerLabel").textContent = player;
 
-   const form = document.getElementById("demoSurveyForm");
-   const feedback = document.getElementById("surveyFeedback");
+      const form = document.getElementById("demoSurveyForm");
+      const feedback = document.getElementById("surveyFeedback");
 
-   // Detectar cuando se envía el formulario
-   form.addEventListener("submit", (event) => {
-     feedback.textContent = "Enviando respuestas...";
-   });
+      form.addEventListener("submit", function(e) {
+        e.preventDefault(); // 🚨 evita GET
 
-   // Detectar cuando se completa el envío (cuando el iframe recibe respuesta)
-    document.getElementById("responseFrame").addEventListener("load", () => {
-     console.log("Respuesta recibida del servidor");
-     feedback.textContent = "✅ ¡Gracias por tu respuesta! Volviendo al inicio...";
-     form.reset();
-     
-     setTimeout(() => {
-       window.location.href = "../index.html";
-     }, 1500);
-   });
+        feedback.textContent = "Enviando respuestas...";
+
+        const data = new FormData(form);
+
+        fetch(form.action, {
+          method: "POST",
+          body: data
+        })
+        .then(() => {
+          feedback.textContent = "✅ ¡Gracias por tu respuesta! Volviendo al inicio...";
+          form.reset();
+
+          setTimeout(() => {
+            window.location.href = "../index.html";
+          }, 1500);
+        })
+        .catch(() => {
+          feedback.textContent = "❌ Error al enviar";
+      });
+    });
   </script>
 </body>
 </html>
