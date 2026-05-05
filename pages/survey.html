@@ -34,7 +34,15 @@
 
       <h1 class="hero-title demo-title">Ayudanos a mejorar</h1>
 
-      <form id="demoSurveyForm" class="demo-form" action="https://script.google.com/macros/s/AKfycbx4BO-TuMUYoKQ7SN1LA8DSp-WgAZHNJMjFt4x8Ln36GCp-rvCppsuAKp53a5vTNmav/exec">
+      <!-- ✅ FORM CORREGIDO -->
+      <form 
+        id="demoSurveyForm"
+        class="demo-form"
+        action="https://script.google.com/macros/s/AKfycbysUEI8bo6NDbV9OC_lL8a-jSq0k1XoyIEv7ixEDWQV5P6mraA-PPASRp7R-zfgWuMLuw/exec"
+        method="POST"
+        target="responseFrame"
+      >
+
         <label>
           ¿Como fue tu visita?
           <select name="visita" required>
@@ -65,50 +73,48 @@
         <div class="demo-actions">
           <button class="btn btn-primary" type="submit">ENVIAR</button>
         </div>
+
       </form>
 
-      <p id="surveyFeedback" class="demo-feedback">Completa el formulario para ver el mensaje de envio.</p>
+      <p id="surveyFeedback" class="demo-feedback">
+        Completa el formulario para ver el mensaje de envio.
+      </p>
+
+      <!-- ✅ iframe obligatorio -->
+      <iframe name="responseFrame" style="display:none"></iframe>
+
     </section>
   </main>
 
+  <!-- ✅ JAVASCRIPT CORRECTO -->
   <script>
-        const player = localStorage.getItem("tecnotecaPlayerName") || "Sin nombre";
-      document.getElementById("playerLabel").textContent = player;
+    const player = localStorage.getItem("tecnotecaPlayerName") || "Sin nombre";
+    document.getElementById("playerLabel").textContent = player;
 
-      const form = document.getElementById("demoSurveyForm");
-      const feedback = document.getElementById("surveyFeedback");
+    const form = document.getElementById("demoSurveyForm");
+    const feedback = document.getElementById("surveyFeedback");
+    const iframe = document.querySelector("iframe");
 
-      form.addEventListener("submit", function(e) {
-        e.preventDefault();
+    let enviado = false;
 
-        feedback.textContent = "Enviando respuestas...";
+    form.addEventListener("submit", () => {
+      enviado = true;
+      feedback.textContent = "Enviando respuestas...";
+    });
 
-        const data = new URLSearchParams();
-        data.append("visita", form.visita.value);
-        data.append("gusto", form.gusto.value);
-        data.append("comentarios", form.comentarios.value);
+    iframe.addEventListener("load", () => {
+      if (!enviado) return;
 
-        fetch(form.action, {
-          method: "POST",
-          body: data,
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-          }
-        })
-        .then(res => res.text())
-        .then(() => {
-          feedback.textContent = "✅ ¡Gracias por tu respuesta! Volviendo al inicio...";
-          form.reset();
+      feedback.textContent = "✅ ¡Gracias por tu respuesta! Volviendo al inicio...";
+      form.reset();
 
-          setTimeout(() => {
-            window.location.href = "../index.html";
-          }, 1500);
-        })
-        .catch((error) => {
-          console.error(error);
-          feedback.textContent = "❌ Error al enviar";
-        });
-      });
+      setTimeout(() => {
+        window.location.href = "../index.html";
+      }, 1500);
+
+      enviado = false;
+    });
   </script>
+
 </body>
 </html>
