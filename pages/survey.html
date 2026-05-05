@@ -34,32 +34,32 @@
 
       <h1 class="hero-title demo-title">Ayudanos a mejorar</h1>
 
-      <form id="demoSurveyForm" class="demo-form">
+      <form id="demoSurveyForm" class="demo-form" action="https://script.google.com/macros/s/AKfycbz9G_u0d66tJOxPTzDS89yJKHg7fa6d_DIzFqTvh6vU9mDpLMYqyT6OPoYYbg-4BRMlrA/exec" method="POST" target="responseFrame">
         <label>
           ¿Como fue tu visita?
-          <select required>
+          <select name="visita" required>
             <option value="" selected disabled>Selecciona una opcion</option>
-            <option>Excelente</option>
-            <option>Buena</option>
-            <option>Regular</option>
-            <option>Mejorable</option>
+            <option value="Excelente">Excelente</option>
+            <option value="Buena">Buena</option>
+            <option value="Regular">Regular</option>
+            <option value="Mejorable">Mejorable</option>
           </select>
         </label>
 
         <label>
           ¿Que te gusto mas?
-          <select required>
+          <select name="gusto" required>
             <option value="" selected disabled>Selecciona una opcion</option>
-            <option>Zona de tecnologia</option>
-            <option>Zona de lectura</option>
-            <option>Talleres</option>
-            <option>Juegos</option>
+            <option value="Zona de tecnologia">Zona de tecnologia</option>
+            <option value="Zona de lectura">Zona de lectura</option>
+            <option value="Talleres">Talleres</option>
+            <option value="Juegos">Juegos</option>
           </select>
         </label>
 
         <label>
           Comentarios
-          <textarea rows="4" placeholder="Escribe una sugerencia..."></textarea>
+          <textarea name="comentarios" rows="4" placeholder="Escribe una sugerencia..."></textarea>
         </label>
 
         <div class="demo-actions">
@@ -78,65 +78,24 @@
    const player = localStorage.getItem("tecnotecaPlayerName") || "Sin nombre";
    document.getElementById("playerLabel").textContent = player;
 
-        const form = document.getElementById("demoSurveyForm");
-        const feedback = document.getElementById("surveyFeedback");
+   const form = document.getElementById("demoSurveyForm");
+   const feedback = document.getElementById("surveyFeedback");
 
-        // REEMPLAZA ESTO CON TU URL
-        const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7JGs-ncgbVC2jV041iJvA5eu6euCBhrGJKMQxW8bDw3FmsLlTQ973GMaSuozk6cbRCQ/exec";
+   // Detectar cuando se envía el formulario
+   form.addEventListener("submit", (event) => {
+     feedback.textContent = "Enviando respuestas...";
+   });
 
-        form.addEventListener("submit", (event) => {
-          event.preventDefault();
-          
-          const selects = form.querySelectorAll("select");
-          const textarea = form.querySelector("textarea");
-          
-          // Validar que estén completos
-          if (!selects[0].value || !selects[1].value) {
-            feedback.textContent = "❌ Por favor completa todas las opciones";
-            return;
-          }
-          
-          // Crear formulario oculto para enviar
-          const hiddenForm = document.createElement("form");
-          hiddenForm.method = "POST";
-          hiddenForm.action = GOOGLE_APPS_SCRIPT_URL;
-          hiddenForm.target = "responseFrame";
-          hiddenForm.style.display = "none";
-          
-          // Agregar campos
-          const visitaInput = document.createElement("input");
-          visitaInput.name = "visita";
-          visitaInput.value = selects[0].value;
-          hiddenForm.appendChild(visitaInput);
-          
-          const gustoInput = document.createElement("input");
-          gustoInput.name = "gusto";
-          gustoInput.value = selects[1].value;
-          hiddenForm.appendChild(gustoInput);
-          
-          const comentariosInput = document.createElement("input");
-          comentariosInput.name = "comentarios";
-          comentariosInput.value = textarea.value;
-          hiddenForm.appendChild(comentariosInput);
-          
-          // Enviar
-          document.body.appendChild(hiddenForm);
-          feedback.textContent = "Enviando respuestas...";
-          console.log("Enviando datos a:", GOOGLE_APPS_SCRIPT_URL);
-          
-          hiddenForm.submit();
-          
-          // Mostrar confirmación después de enviar
-          setTimeout(() => {
-            feedback.textContent = "✅ ¡Gracias por tu respuesta! Volviendo al inicio...";
-            form.reset();
-            document.body.removeChild(hiddenForm);
-            
-            setTimeout(() => {
-              window.location.href = "../index.html";
-            }, 1500);
-          }, 800);
-        });
+   // Detectar cuando se completa el envío (cuando el iframe recibe respuesta)
+   document.getElementById("responseFrame").addEventListener("load", () => {
+     console.log("Respuesta recibida del servidor");
+     feedback.textContent = "✅ ¡Gracias por tu respuesta! Volviendo al inicio...";
+     form.reset();
+     
+     setTimeout(() => {
+       window.location.href = "../index.html";
+     }, 1500);
+   });
   </script>
 </body>
 </html>
