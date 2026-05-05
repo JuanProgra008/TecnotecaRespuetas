@@ -72,23 +72,30 @@
   </main>
 
   <script>
-      const player = localStorage.getItem("tecnotecaPlayerName") || "Sin nombre";
+        const player = localStorage.getItem("tecnotecaPlayerName") || "Sin nombre";
       document.getElementById("playerLabel").textContent = player;
 
       const form = document.getElementById("demoSurveyForm");
       const feedback = document.getElementById("surveyFeedback");
 
       form.addEventListener("submit", function(e) {
-        e.preventDefault(); // 🚨 evita GET
+        e.preventDefault();
 
         feedback.textContent = "Enviando respuestas...";
 
-        const data = new FormData(form);
+        const data = new URLSearchParams();
+        data.append("visita", form.visita.value);
+        data.append("gusto", form.gusto.value);
+        data.append("comentarios", form.comentarios.value);
 
         fetch(form.action, {
           method: "POST",
-          body: data
+          body: data,
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          }
         })
+        .then(res => res.text())
         .then(() => {
           feedback.textContent = "✅ ¡Gracias por tu respuesta! Volviendo al inicio...";
           form.reset();
@@ -97,10 +104,11 @@
             window.location.href = "../index.html";
           }, 1500);
         })
-        .catch(() => {
+        .catch((error) => {
+          console.error(error);
           feedback.textContent = "❌ Error al enviar";
+        });
       });
-    });
   </script>
 </body>
 </html>
