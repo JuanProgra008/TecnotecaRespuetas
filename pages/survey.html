@@ -68,6 +68,9 @@
       </form>
 
       <p id="surveyFeedback" class="demo-feedback">Completa el formulario para ver el mensaje de envio.</p>
+      
+      <!-- iframe oculto para enviar datos a Google Apps Script -->
+      <iframe id="responseFrame" name="responseFrame" style="display:none"></iframe>
     </section>
   </main>
 
@@ -81,43 +84,58 @@
         // REEMPLAZA ESTO CON TU URL
         const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7JGs-ncgbVC2jV041iJvA5eu6euCBhrGJKMQxW8bDw3FmsLlTQ973GMaSuozk6cbRCQ/exec";
 
-        form.addEventListener("submit", async (event) => {
+        form.addEventListener("submit", (event) => {
           event.preventDefault();
           
           const selects = form.querySelectorAll("select");
           const textarea = form.querySelector("textarea");
           
-          // Crear FormData para enviar los datos
-          const formData = new FormData();
-          formData.append("visita", selects[0].value);
-          formData.append("gusto", selects[1].value);
-          formData.append("comentarios", textarea.value);
+          // Validar que estén completos
+          if (!selects[0].value || !selects[1].value) {
+            feedback.textContent = "❌ Por favor completa todas las opciones";
+            return;
+          }
           
-          try {
-            feedback.textContent = "Enviando respuestas...";
-            console.log("Enviando datos...");
-            console.log("URL:", GOOGLE_APPS_SCRIPT_URL);
-            
-            const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-              method: "POST",
-              mode: "no-cors",
-              body: formData
-            });
-            
-            // Con no-cors, no podemos leer la respuesta, pero los datos se envían correctamente
-            console.log("Solicitud enviada correctamente");
+          // Crear formulario oculto para enviar
+          const hiddenForm = document.createElement("form");
+          hiddenForm.method = "POST";
+          hiddenForm.action = GOOGLE_APPS_SCRIPT_URL;
+          hiddenForm.target = "responseFrame";
+          hiddenForm.style.display = "none";
+          
+          // Agregar campos
+          const visitaInput = document.createElement("input");
+          visitaInput.name = "visita";
+          visitaInput.value = selects[0].value;
+          hiddenForm.appendChild(visitaInput);
+          
+          const gustoInput = document.createElement("input");
+          gustoInput.name = "gusto";
+          gustoInput.value = selects[1].value;
+          hiddenForm.appendChild(gustoInput);
+          
+          const comentariosInput = document.createElement("input");
+          comentariosInput.name = "comentarios";
+          comentariosInput.value = textarea.value;
+          hiddenForm.appendChild(comentariosInput);
+          
+          // Enviar
+          document.body.appendChild(hiddenForm);
+          feedback.textContent = "Enviando respuestas...";
+          console.log("Enviando datos a:", GOOGLE_APPS_SCRIPT_URL);
+          
+          hiddenForm.submit();
+          
+          // Mostrar confirmación después de enviar
+          setTimeout(() => {
             feedback.textContent = "✅ ¡Gracias por tu respuesta! Volviendo al inicio...";
             form.reset();
+            document.body.removeChild(hiddenForm);
             
             setTimeout(() => {
               window.location.href = "../index.html";
-            }, 1800);
-            
-          } catch (error) {
-            feedback.textContent = "❌ Error al conectar: " + error.message;
-            console.error("Error completo:", error);
-            console.error("Stack:", error.stack);
-          }
+            }, 1500);
+          }, 800);
         });
   </script>
 </body>
