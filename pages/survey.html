@@ -34,7 +34,7 @@
 
       <h1 class="hero-title demo-title">Ayudanos a mejorar</h1>
 
-      <form id="demoSurveyForm" class="demo-form" action="https://script.google.com/macros/s/AKfycbz9G_u0d66tJOxPTzDS89yJKHg7fa6d_DIzFqTvh6vU9mDpLMYqyT6OPoYYbg-4BRMlrA/exec" method="POST" target="responseFrame">
+      <form id="demoSurveyForm" class="demo-form" action="https://script.google.com/macros/s/AKfycbyDEOZHPwuERcPZTx0COSpclkGXLuqrPIChVl-N5-1smSdLODUQdIP_23F3kz2C3oNYPA/exec">
         <label>
           ¿Como fue tu visita?
           <select name="visita" required>
@@ -87,7 +87,7 @@
    });
 
    // Detectar cuando se completa el envío (cuando el iframe recibe respuesta)
-   document.getElementById("responseFrame").addEventListener("load", () => {
+    document.getElementById("responseFrame").addEventListener("load", () => {
      console.log("Respuesta recibida del servidor");
      feedback.textContent = "✅ ¡Gracias por tu respuesta! Volviendo al inicio...";
      form.reset();
